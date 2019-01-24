@@ -191,6 +191,7 @@ function Main {
     } catch {
         throw $_
     } finally {
+        <#
         try {
             Parse-LisaLogs -LisUrl $LisUrl -ConfigPath $ConfigPath -XmlTest ".\xml\${XmlTest}"
         } catch {
@@ -213,6 +214,7 @@ function Main {
                 -ErrorAction SilentlyContinue
         }
     }
+    #>
 }
 
 Main
