@@ -1,6 +1,5 @@
 #!/usr/bin/env groovy
 
-withCredentials(bindings: [string(credentialsId: 'LIS_OLD_ARCHIVE_VERSION', variable: 'LIS_OLD_ARCHIVE_VERSION')]) {
 properties ([
     disableConcurrentBuilds(),
     [$class: 'ParametersDefinitionProperty',
@@ -27,7 +26,6 @@ properties ([
         ]
     ]
 ])
-}
 
 // defines deploy scenarios coverage - platform independent
 def nodesMap = ["sriov":"rhel_7.3,rhel_7.4,centos_7.4,centos_7.3,rhel_7.3_gen2vm,rhel_7.5,centos_7.5,", \
