@@ -171,6 +171,9 @@ function Main {
         $OsVHD = $VHD_Path | Split-Path -Leaf        
         if (Test-Path $VHD_Path)
         {
+            Write-Host "Cloning LISAv2"
+            git clone https://github.com/LIS/LISAv2.git .
+            Write-Host "Starting LISAv2"
             .\Run-LisaV2.ps1 -TestPlatform HyperV -TestLocation localhost -SourceOsVHDPath $SourceVHDPath -RGIdentifier DELETEME -OsVHD $OsVHD -TestNames 'BVT-VERIFY-DEPLOYMENT-PROVISION' -ForceDeleteResources -ExitWithZero
         }
         else
