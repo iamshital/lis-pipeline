@@ -212,8 +212,8 @@ stage("Validation stage") {
                                             -ConfigPath "\${env:DB_CONFIG_VALIDATION}"
                                             -AzureToken "\${env:AZURE_SAS}"
                                         """)
-                                    archiveArtifacts '\\lis-test\\WS2012R2\\lisa\\TestResults\\**\\*'
-                                    junit (testResults: '\\lis-test\\WS2012R2\\lisa\\TestResults\\**\\*.xml', keepLongStdio: true)
+                                    //archiveArtifacts '\\lis-test\\WS2012R2\\lisa\\TestResults\\**\\*'
+                                    //junit (testResults: '\\lis-test\\WS2012R2\\lisa\\TestResults\\**\\*.xml', keepLongStdio: true)
                                 }
                             }
                         }
@@ -224,7 +224,7 @@ stage("Validation stage") {
     
     try {
         if(env.ENABLED_STAGES.contains("validation")) {
-            //parallel runs
+            parallel runs
         }
     } catch (exc) {
         currentBuild.result = 'SUCCESS'
