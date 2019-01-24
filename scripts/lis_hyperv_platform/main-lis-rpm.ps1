@@ -137,16 +137,17 @@ function Main {
     Write-Host "Getting LISA code..."
     Get-LisaCode -LISAPath $LISAPath
 
+    <#
     Write-Host "Copying lisa dependencies from share"
     Copy-LisaTestDependencies `
         -TestDependenciesFolders @("bin", "Infrastructure", "tools", "ssh", "setupScripts", "remote-scripts\ica" ) `
         -LISARelPath $LISARelPath
-    
+    #>
     $VMgeneration = "1"
     if ($DistroVersion -like "*gen2vm*") {
         $VMgeneration = "2"
     }
-    Push-Location "${LISARelPath}\xml"
+    #Push-Location "${LISARelPath}\xml"
     try {
         #Edit-TestXML -Path $XmlTest -VMSuffix $InstanceName -VMgen $VMgeneration
     } catch {
@@ -155,7 +156,7 @@ function Main {
         Pop-Location
     }
 
-    Push-Location $LISARelPath
+    #Push-Location $LISARelPath
     Write-Host "Started running LISA"
     try {
 
@@ -171,7 +172,7 @@ function Main {
         $OsVHD = $VHD_Path | Split-Path -Leaf        
         if (Test-Path $VHD_Path)
         {
-            Write-Host "Cloning LISAv2"
+            Write-Host "Cloning LISAv2 into $PWD"
             git clone https://github.com/LIS/LISAv2.git .
             Write-Host "Starting LISAv2"
             .\Run-LisaV2.ps1 -TestPlatform HyperV -TestLocation localhost -SourceOsVHDPath $SourceVHDPath -RGIdentifier DELETEME -OsVHD $OsVHD -TestNames 'BVT-VERIFY-DEPLOYMENT-PROVISION' -ForceDeleteResources -ExitWithZero
