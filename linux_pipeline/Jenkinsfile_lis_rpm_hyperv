@@ -111,6 +111,7 @@ stage ("Deploy stage") {
                 runs ["${it}-${testNode}"] = {
                     node ("${testNode}") {
                         stage ("${it}-${testNode}") {
+                            println ("stage ${it}-${testNode}")
                             withCredentials(bindings: [string(credentialsId: 'LISA_IMAGES_SHARE_URL', variable: 'LISA_IMAGES_SHARE_URL'),
                                         string(credentialsId: 'AZURE_SAS', variable: 'AZURE_SAS'),
                                         string(credentialsId: 'LISA_TEST_DEPENDENCIES', variable: 'LISA_TEST_DEPENDENCIES'),
