@@ -38,7 +38,7 @@ function Get-LisaCode {
     if (Test-Path $LISAPath) {
         rm -Recurse -Force $LISAPath
     }
-    git clone https://github.com/LIS/lis-test.git $LISAPath
+    git clone https://github.com/LIS/LISAv2.git $LISAPath
 }
 
 function Copy-LisaTestDependencies {
@@ -132,6 +132,8 @@ function Main {
     Write-Host "Getting the proper VHD folder name for LISA with $DistroVersion"
     $imageFolder = Join-Path $LISAImagesShareUrl $DistroVersion.split("_")[0]
     $imageFolder = Join-Path $imageFolder $DistroVersion
+    $VHD_Path = Join-Path $DistroVersion
+    Get-Vhd -Path $VHD_Path
 
     Write-Host "Getting LISA code..."
     Get-LisaCode -LISAPath $LISAPath
