@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-
+withCredentials(bindings: [string(credentialsId: 'LIS_OLD_ARCHIVE_VERSION', variable: 'LIS_OLD_ARCHIVE_VERSION')]) {
 properties ([
     disableConcurrentBuilds(),
     [$class: 'ParametersDefinitionProperty',
@@ -15,7 +15,7 @@ properties ([
             description: 'Link to the lis archive to be tested'],
         [$class: 'StringParameterDefinition',
             name: 'LIS_OLD_ARCHIVE_LINK',
-            defaultValue: "TEST2",
+            defaultValue: "${LIS_OLD_ARCHIVE_VERSION}",
             description: 'Link to the previous lis version'],
         [$class: 'ChoiceParameterDefinition', choices: 'no\nyes',
             name: 'FULL_PERF_RUN',
@@ -27,6 +27,7 @@ properties ([
         ]
     ]
 ])
+}
 
 // defines deploy scenarios coverage - platform independent
 def nodesMap = ["sriov":"rhel_7.3,rhel_7.4,centos_7.4,centos_7.3,rhel_7.3_gen2vm,rhel_7.5,centos_7.5,", \
@@ -170,10 +171,10 @@ node("jenkins-meta-slave") {
     stage('Local Hyper-V performance') {
             withCredentials(bindings:[ string(credentialsId: 'AZURE_SAS', variable: 'AZURE_SAS')]) {
                 if(env.ENABLED_STAGES.contains("perf")) {
-                    build job: "performance-jobs/Pipeline_Performance_LIS", parameters: [
-                        string(name: 'LIS_URL', value: "${env:LIS_ARCHIVE_LINK}"),
-                        string(name: 'AZURE_TOKEN', value: "${env:AZURE_SAS}"),
-                        string(name: 'FULL_PERF_RUN', value: "${env:FULL_PERF_RUN}"),], wait: false;
+                    //build job: "performance-jobs/Pipeline_Performance_LIS", parameters: [
+                    //    string(name: 'LIS_URL', value: "${env:LIS_ARCHIVE_LINK}"),
+                    //    string(name: 'AZURE_TOKEN', value: "${env:AZURE_SAS}"),
+                    //    string(name: 'FULL_PERF_RUN', value: "${env:FULL_PERF_RUN}"),], wait: false;
                     echo "Triggered LIS Local Hyper-V Performance tests."
                 }
             }
