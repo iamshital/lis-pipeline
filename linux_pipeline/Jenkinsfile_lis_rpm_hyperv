@@ -112,12 +112,6 @@ stage ("Deploy stage") {
                     node ("${testNode}") {
                         stage ("${it}-${testNode}") {
                             println ("stage ${it}-${testNode}")
-                            withCredentials(bindings: [string(credentialsId: 'LISA_IMAGES_SHARE_URL', variable: 'LISA_IMAGES_SHARE_URL'),
-                                        string(credentialsId: 'AZURE_SAS', variable: 'AZURE_SAS'),
-                                        string(credentialsId: 'LISA_TEST_DEPENDENCIES', variable: 'LISA_TEST_DEPENDENCIES'),
-                                        string(credentialsId: 'LIS_SECRET_PARAMS', variable: 'LIS_SECRET_PARAMS'),
-                                        string(credentialsId: 'LISA_LOG_DESTINATION', variable: 'LISA_LOG_DESTINATION'),
-                                        string(credentialsId: 'DB_CONFIG_DEPLOY', variable: 'DB_CONFIG_DEPLOY')]) {
                                 println ("withCredentials")
                                 def sleepTime = globalSleepTime
                                 globalSleepTime = globalSleepTime + 30
@@ -135,9 +129,9 @@ stage ("Deploy stage") {
                                             -JobId '${it}-d-${BUILD_NUMBER}'
                                             -InstanceName '${it}-deploy'
                                             -DistroVersion '${it}' -WorkingDirectory 'C:\\workspace'
-                                            -LISAImagesShareUrl '${LISA_IMAGES_SHARE_URL}' 
+                                            -LISAImagesShareUrl '\\\\redmond\\wsscfs\\OSTC\\LIS\\VHD\\Cloudbase' 
                                             -XmlTest 'lis_pipeline_deploy_scenarios.xml'
-                                            -LisaTestDependencies '${LISA_TEST_DEPENDENCIES}'
+                                            -LisaTestDependencies '\\\\redmond\\wsscfs\\OSTC\\LIS\\TestContent\'
                                             -LisUrl "\${env:LIS_ARCHIVE_LINK}"
                                             -LisOldUrl "\${env:LIS_OLD_ARCHIVE_LINK}"
                                             -LisaSuite '${lisSuite}'
@@ -148,8 +142,8 @@ stage ("Deploy stage") {
                                             -ConfigPath "\${env:DB_CONFIG_DEPLOY}"
                                             -AzureToken "\${env:AZURE_SAS}"
                                         """)
-                                    archiveArtifacts '\\lis-test\\WS2012R2\\lisa\\TestResults\\**\\*'
-                                    junit (testResults: '\\lis-test\\WS2012R2\\lisa\\TestResults\\**\\*.xml', keepLongStdio: true)
+                                    //archiveArtifacts '\\lis-test\\WS2012R2\\lisa\\TestResults\\**\\*'
+                                    //junit (testResults: '\\lis-test\\WS2012R2\\lisa\\TestResults\\**\\*.xml', keepLongStdio: true)
                                 }
                             }
                         }
@@ -157,7 +151,7 @@ stage ("Deploy stage") {
                 }
             }
         }
-    }
+
     
     try {
         if(env.ENABLED_STAGES.contains("deployment_scenarios")) {
@@ -198,11 +192,6 @@ stage("Validation stage") {
                 runs["${TEST_TYPE}-${it}-${testNode}"] = {
                     node("${testNode}") {
                         stage("${TEST_TYPE}-${it}-${testNode}") {
-                            withCredentials(bindings: [string(credentialsId: 'LISA_IMAGES_SHARE_URL', variable: 'LISA_IMAGES_SHARE_URL'),
-                                        string(credentialsId: 'AZURE_SAS', variable: 'AZURE_SAS'),
-                                        string(credentialsId: 'LISA_TEST_DEPENDENCIES', variable: 'LISA_TEST_DEPENDENCIES'),
-                                        string(credentialsId: 'LISA_LOG_DESTINATION', variable: 'LISA_LOG_DESTINATION'),
-                                        string(credentialsId: 'DB_CONFIG_VALIDATION', variable: 'DB_CONFIG_VALIDATION')]) { 
                                 def sleepTime = globalSleepTime
                                 globalSleepTime = globalSleepTime + 30
                                 dir ("b${BUILD_NUMBER}") {
@@ -213,9 +202,9 @@ stage("Validation stage") {
                                             -JobId '${it}-b-${BUILD_NUMBER}'
                                             -InstanceName '${it}-${TEST_TYPE}'
                                             -DistroVersion '${it}' -WorkingDirectory 'C:\\workspace'
-                                            -LISAImagesShareUrl '${LISA_IMAGES_SHARE_URL}' 
+                                            -LISAImagesShareUrl '\\\\redmond\\wsscfs\\OSTC\\LIS\\VHD\\Cloudbase' 
                                             -XmlTest '${XML_NAME}'
-                                            -LisaTestDependencies '${LISA_TEST_DEPENDENCIES}'
+                                            -LisaTestDependencies '\\\\redmond\\wsscfs\\OSTC\\LIS\\TestContent\'
                                             -LisUrl "\${env:LIS_ARCHIVE_LINK}"
                                             -TestType '${TEST_TYPE}'
                                             -LogsPath "\${env:LISA_LOG_DESTINATION}"
@@ -232,11 +221,10 @@ stage("Validation stage") {
                 }
             }
         }
-    }
     
     try {
         if(env.ENABLED_STAGES.contains("validation")) {
-            parallel runs
+            //parallel runs
         }
     } catch (exc) {
         currentBuild.result = 'SUCCESS'
