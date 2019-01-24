@@ -213,8 +213,8 @@ function Main {
             Stop-Process -Force $child.Handle -Confirm:$false `
                 -ErrorAction SilentlyContinue
         }
-    }
     #>
+    }
 }
 
 Main
