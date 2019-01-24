@@ -106,6 +106,7 @@ stage ("Deploy stage") {
             testNode = 'ws2016'
         }
         DISTROS.each {
+            println ("Distros.each ${it}")
             if (mappedDistros.contains("${it},")) {
                 runs ["${it}-${testNode}"] = {
                     node ("${testNode}") {
