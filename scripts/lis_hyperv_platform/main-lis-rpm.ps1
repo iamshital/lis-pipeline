@@ -132,7 +132,7 @@ function Main {
     Write-Host "Getting the proper VHD folder name for LISA with $DistroVersion"
     $imageFolder = Join-Path $LISAImagesShareUrl $DistroVersion.split("_")[0]
     $imageFolder = Join-Path $imageFolder $DistroVersion
-    $VHD_Path = Join-Path $imageFolder $DistroVersion
+    $VHD_Path = Join-Path $imageFolder "$($DistroVersion).vhdx"
     Get-Vhd -Path $VHD_Path
 
     Write-Host "Getting LISA code..."
