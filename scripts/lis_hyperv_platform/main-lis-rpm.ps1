@@ -167,11 +167,15 @@ function Main {
         Write-Host "testParams=$lisaParams"
         Write-Host "suite=$LisaSuite"
         Write-Host "commandParams=$commandParams"
+        $SourceVHDPath = $VHD_Path | Split-Path -Parent
+        $OsVHD = $VHD_Path | Split-Path -Leaf        
         if (Test-Path $VHD_Path)
         {
-            $SourceVHDPath = $VHD_Path | Split-Path -Parent
-            $OsVHD = $VHD_Path | Split-Path -Leaf
             .\Run-LisaV2.ps1 -TestPlatform HyperV -TestLocation localhost -SourceOsVHDPath $SourceVHDPath -RGIdentifier DELETEME -OsVHD $OsVHD -TestNames 'BVT-VERIFY-DEPLOYMENT-PROVISION' -ForceDeleteResources -ExitWithZero
+        }
+        else
+        {
+            Get-ChildItem -Path $SourceVHDPath -Recurse
         }
         <#
         
