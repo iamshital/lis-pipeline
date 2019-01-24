@@ -14,7 +14,7 @@ properties ([
             description: 'Link to the lis archive to be tested'],
         [$class: 'StringParameterDefinition',
             name: 'LIS_OLD_ARCHIVE_LINK',
-            defaultValue: "${LIS_OLD_ARCHIVE_VERSION}",
+            defaultValue: "TEST2",
             description: 'Link to the previous lis version'],
         [$class: 'ChoiceParameterDefinition', choices: 'no\nyes',
             name: 'FULL_PERF_RUN',
