@@ -133,7 +133,6 @@ function Main {
     $imageFolder = Join-Path $LISAImagesShareUrl $DistroVersion.split("_")[0]
     $imageFolder = Join-Path $imageFolder $DistroVersion
     $VHD_Path = Join-Path $imageFolder "$($DistroVersion).vhdx"
-    Get-Vhd -Path $VHD_Path
 
     Write-Host "Getting LISA code..."
     Get-LisaCode -LISAPath $LISAPath
@@ -149,7 +148,7 @@ function Main {
     }
     Push-Location "${LISARelPath}\xml"
     try {
-        Edit-TestXML -Path $XmlTest -VMSuffix $InstanceName -VMgen $VMgeneration
+        #Edit-TestXML -Path $XmlTest -VMSuffix $InstanceName -VMgen $VMgeneration
     } catch {
         throw
     } finally {
@@ -168,6 +167,12 @@ function Main {
         Write-Host "testParams=$lisaParams"
         Write-Host "suite=$LisaSuite"
         Write-Host "commandParams=$commandParams"
+        if (Test-Path $VHD_Path)
+        {
+            $SourceVHDPath = $VHD_Path | Split-Path -Parent
+            $OsVHD = $VHD_Path | Split-Path -Leaf
+            .\Run-LisaV2.ps1 -TestPlatform HyperV -TestLocation localhost -SourceOsVHDPath $SourceVHDPath -RGIdentifier DELETEME -OsVHD $OsVHD -TestNames 'BVT-VERIFY-DEPLOYMENT-PROVISION' -ForceDeleteResources -ExitWithZero
+        }
         <#
         
         $lisaParams = ("LIS_URL='{0}';AZURE_TOKEN='{1}';LIS_URL_PREVIOUS='{2}'" -f @($LisUrl, $AzureToken, $LisOldUrl))
