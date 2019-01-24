@@ -173,9 +173,12 @@ function Main {
         if (Test-Path $VHD_Path)
         {
             Write-Host "Cloning LISAv2 into $PWD"
-            git clone https://github.com/LIS/LISAv2.git .
+            mkdir LISAv2
+            git clone https://github.com/LIS/LISAv2.git LISAv2
+            Push-Location LISAv2
             Write-Host "Starting LISAv2"
             .\Run-LisaV2.ps1 -TestPlatform HyperV -TestLocation localhost -SourceOsVHDPath $SourceVHDPath -RGIdentifier DELETEME -OsVHD $OsVHD -TestNames 'BVT-VERIFY-DEPLOYMENT-PROVISION' -ForceDeleteResources -ExitWithZero
+            Pop-Location
         }
         else
         {
