@@ -157,6 +157,17 @@ function Main {
     Push-Location $LISARelPath
     Write-Host "Started running LISA"
     try {
+
+        Write-Host "LisUrl=$LisUrl"
+        Write-Host "AzureToken=$AzureToken"
+        Write-Host "LisOldUrl=$LisOldUrl"
+        Write-Host "XmlTest=$XmlTest"
+        Write-Host "CLImageStorDir=$imageFolder"
+        Write-Host "testParams=$lisaParams"
+        Write-Host "suite=$LisaSuite"
+        Write-Host "commandParams=$commandParams"
+        <#
+        
         $lisaParams = ("LIS_URL='{0}';AZURE_TOKEN='{1}';LIS_URL_PREVIOUS='{2}'" -f @($LisUrl, $AzureToken, $LisOldUrl))
         if ($LisaOptionalParams) {
             $lisaParams += ";${LisaOptionalParams}"
@@ -176,6 +187,7 @@ function Main {
         } else {
             Write-Host "Finished running LISA with exit code: ${LASTEXITCODE}"
         }
+        #>
     } catch {
         throw $_
     } finally {
