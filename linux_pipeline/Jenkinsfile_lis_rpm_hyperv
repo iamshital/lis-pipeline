@@ -118,6 +118,7 @@ stage ("Deploy stage") {
                                         string(credentialsId: 'LIS_SECRET_PARAMS', variable: 'LIS_SECRET_PARAMS'),
                                         string(credentialsId: 'LISA_LOG_DESTINATION', variable: 'LISA_LOG_DESTINATION'),
                                         string(credentialsId: 'DB_CONFIG_DEPLOY', variable: 'DB_CONFIG_DEPLOY')]) {
+                                println ("withCredentials")
                                 def sleepTime = globalSleepTime
                                 globalSleepTime = globalSleepTime + 30
                                 def lisSuite = ''
