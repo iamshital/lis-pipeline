@@ -188,7 +188,7 @@ function Main {
             mkdir LISAv2
             git clone https://github.com/LIS/LISAv2.git LISAv2
             Push-Location LISAv2
-            Write-Host "Starting LISAv2"
+            Write-Host "Starting LISAv2 in $env:computername on $VHD_Path"
             #.\Run-LisaV2.ps1 -TestPlatform HyperV -TestLocation localhost -SourceOsVHDPath $SourceVHDPath -RGIdentifier DELETEME -OsVHD $OsVHD -TestNames 'BVT-VERIFY-DEPLOYMENT-PROVISION' -ForceDeleteResources -ExitWithZero
             Pop-Location
         }
