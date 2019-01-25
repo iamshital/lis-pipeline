@@ -142,9 +142,9 @@ function Main {
     Write-Host "Getting the proper VHD folder name for LISA with $DistroVersion"
     $imageFolder = Join-Path $LISAImagesShareUrl $DistroVersion.split("_")[0]
     $imageFolder = Join-Path $imageFolder $DistroVersion
-    
+    $parentVhd = $(Get-ChildItem $imageFolder | Where-Object { $_.Extension -eq ".vhd" -or $_.Extension -eq ".vhdx"} | Sort LastWriteTime | Select -Last 1).Name
     #
-    $VHD_Path = Join-Path $imageFolder "$($DistroVersion).vhdx"
+    $VHD_Path = Join-Path $imageFolder $parentVhd
 
     Write-Host "Getting LISA code..."
     Get-LisaCode -LISAPath $LISAPath
