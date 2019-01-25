@@ -1,3 +1,4 @@
+[CmdletBinding()]
 param(
     [parameter(Mandatory=$true)]
     [String] $JobId,
@@ -29,6 +30,15 @@ $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $scriptPathParent = (Get-Item $scriptPath ).Parent.FullName
 Import-Module "$scriptPathParent\utils\powershell\helpers.psm1"
 $pythonPath = Join-Path "${env:SystemDrive}" "Python27\python.exe"
+
+
+
+foreach ($key in $MyInvocation.BoundParameters.keys)
+{
+    $value = (get-variable $key).Value 
+    write-host "$key -> $value"
+}
+
 
 function Get-LisaCode {
     param(
@@ -132,6 +142,8 @@ function Main {
     Write-Host "Getting the proper VHD folder name for LISA with $DistroVersion"
     $imageFolder = Join-Path $LISAImagesShareUrl $DistroVersion.split("_")[0]
     $imageFolder = Join-Path $imageFolder $DistroVersion
+    
+    #
     $VHD_Path = Join-Path $imageFolder "$($DistroVersion).vhdx"
 
     Write-Host "Getting LISA code..."
@@ -177,7 +189,7 @@ function Main {
             git clone https://github.com/LIS/LISAv2.git LISAv2
             Push-Location LISAv2
             Write-Host "Starting LISAv2"
-            .\Run-LisaV2.ps1 -TestPlatform HyperV -TestLocation localhost -SourceOsVHDPath $SourceVHDPath -RGIdentifier DELETEME -OsVHD $OsVHD -TestNames 'BVT-VERIFY-DEPLOYMENT-PROVISION' -ForceDeleteResources -ExitWithZero
+            #.\Run-LisaV2.ps1 -TestPlatform HyperV -TestLocation localhost -SourceOsVHDPath $SourceVHDPath -RGIdentifier DELETEME -OsVHD $OsVHD -TestNames 'BVT-VERIFY-DEPLOYMENT-PROVISION' -ForceDeleteResources -ExitWithZero
             Pop-Location
         }
         else
