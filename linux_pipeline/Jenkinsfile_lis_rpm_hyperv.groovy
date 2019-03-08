@@ -42,6 +42,10 @@ properties ([
         [$class: 'StringParameterDefinition',
             name: 'GIT_BRANCH',
             defaultValue: "lisav2hyperv",
+            description: ''],
+        [$class: 'StringParameterDefinition',
+            name: 'EXECUTION_TAG',
+            defaultValue: "",
             description: '']
         ]
     ]
@@ -226,6 +230,7 @@ node("meta_slave") {
                                                                     " -LisOldUrl '${env:LIS_OLD_ARCHIVE_LINK}'" +
                                                                     " -ExcludeTests '${env:EXCLUDE_TESTS}'" +
                                                                     " -IncludeTests '${env:RUN_SELECTED_TESTS}'" +
+                                                                    " -ExecutionTag '${env:EXECUTION_TAG}'" +
                                                                     " -Delay '${sleepTime}'"
                                                                 )
                                                                 junit "Report\\*-junit.xml"

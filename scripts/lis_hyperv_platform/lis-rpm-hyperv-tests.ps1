@@ -15,6 +15,7 @@ param(
     [String] $LisOldUrl,
     [String] $ExcludeTests,
     [String] $IncludeTests,
+    [string] $ExecutionTag,
     [String] $Delay
 )
 
@@ -63,6 +64,9 @@ function Main {
             $command += " -ResourceCleanup Delete"
             $command += " -EnableTelemetry"
             $command += " -ExitWithZero"
+            if ($ExecutionTag) {
+                $command += " -ResultDBTestTag '$ExecutionTag'"
+            }
             if ($IncludeTests) {
                 $command += " -TestNames '$IncludeTests'"
             }
