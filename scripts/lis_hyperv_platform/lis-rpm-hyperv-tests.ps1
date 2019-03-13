@@ -61,7 +61,6 @@ function Main {
             $command += " -TestCategory '$TestCategory'"
             $command += " -TestArea '$TestArea'"
             $command += " -VMGeneration '$VMgeneration'"
-            $command += " -ResourceCleanup Delete"
             $command += " -EnableTelemetry"
             $command += " -ExitWithZero"
             if ($ExecutionTag) {
@@ -77,6 +76,7 @@ function Main {
                 $command += " -CustomTestParameters 'LIS_OLD_URL=$LisOldUrl;LIS_CURRENT_URL=$LisUrl'"
             } else {
                 $command += " -CustomLIS '$LisUrl'"
+                $command += " -ResourceCleanup Delete"
             }
             Write-Output $PsCmd
             powershell.exe -NonInteractive -ExecutionPolicy Bypass `
