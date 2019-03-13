@@ -74,6 +74,7 @@ function Main {
             }
             if ($TestArea -imatch "LIS_DEPLOY") {
                 $command += " -CustomTestParameters 'LIS_OLD_URL=$LisOldUrl;LIS_CURRENT_URL=$LisUrl'"
+                $command += " -OverrideVMSize 'Standard_A1'"
             } else {
                 $command += " -CustomLIS '$LisUrl'"
                 $command += " -ResourceCleanup Delete"
