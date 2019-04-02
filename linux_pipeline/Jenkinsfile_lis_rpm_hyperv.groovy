@@ -37,11 +37,11 @@ properties ([
             description: ''],
         [$class: 'StringParameterDefinition',
             name: 'GIT_REPO',
-            defaultValue: "https://github.com/iamshital/LISAv2.git",
+            defaultValue: "https://github.com/LIS/LISAv2.git",
             description: ''],
         [$class: 'StringParameterDefinition',
             name: 'GIT_BRANCH',
-            defaultValue: "lisav2hyperv",
+            defaultValue: "master",
             description: ''],
         [$class: 'StringParameterDefinition',
             name: 'EXECUTION_TAG',
@@ -58,7 +58,6 @@ def nodesMap = ["sriov":"rhel_7.3,rhel_7.4,centos_7.4,centos_7.3,rhel_7.3_gen2vm
                     centos_6.4_x64,centos_6.5_x64,rhel_6.9_x64,", \
                 "ws2016":"oracle_6.5_rhck,oracle_6.9_rhck,oracle_7.4_rhck,oracle_7.0_rhck,centos_7.0_x64, \
                     centos_7.0_gen2vm,centos_7.2_x64,rhel_7.0,rhel_7.1,rhel_7.2,rhel_7.6,rhel_6.10_x64,"]
-//def nodesMap = ["ws2016":"centos_6.8_x64,centos_7.2_x64"]
 
 // defines host version mapping for functional test validation
 def validationNodesMap = ["ws2016":"rhel_6.10_x64,rhel_7.4,centos_6.5_x64,centos_7.3,centos_7.2_x64,rhel_7.5,centos_7.5,", \
@@ -66,16 +65,10 @@ def validationNodesMap = ["ws2016":"rhel_6.10_x64,rhel_7.4,centos_6.5_x64,centos
                           "ws2012_fvt":"centos_6.8_x64,", \
                           "ws2012_bvt":"rhel_7.1,"]
 
-def PassingDistros = "centos_6.4_x64,centos_6.5_x64,centos_6.8_32bit,centos_6.8_x64,centos_6.9_32bit,centos_7.0_gen2vm,centos_7.0_x64,centos_7.2_x64,centos_7.3,centos_7.4,centos_7.5,oracle_6.5_rhck,oracle_6.9_rhck,oracle_7.0_rhck,oracle_7.4_rhck,rhel_6.10_x64,rhel_6.4_32bit,rhel_6.4_x64,rhel_6.5,rhel_6.6_32bit,rhel_6.6_x64,rhel_6.7_gen2vm,rhel_6.8_x64,rhel_6.9_x64,rhel_7.0,rhel_7.1,rhel_7.2,rhel_7.3,rhel_7.3_gen2vm,rhel_7.4,rhel_7.5,rhel_7.6"
-PassingDistros = PassingDistros.split(",")
-
 def supportedDistros = nodesMap["ws2012"] + nodesMap["ws2012r2"] + nodesMap["ws2016"] + nodesMap["sriov"]
-//def supportedDistros = nodesMap["ws2016"]
 
 def RunPowershellCommand(psCmd) {
     bat "powershell.exe -NonInteractive -ExecutionPolicy Bypass -Command \"[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;$psCmd;EXIT \$global:LastExitCode\""
-    //powershell (psCmd)
-    //println(psCmd)
 }
 
 def getDistros (distros, supportedDistros) {
@@ -153,131 +146,118 @@ stage ("Prerequisite")
 node("meta_slave") {
 
     DISTROS = getDistros (DISTRO_VERSIONS, supportedDistros)
-
     CategoryAreaMapKeySet=CategoryAreaMap.keySet()
-    //println(CategoryAreaMapKeySet)
-
     CategoryAreaMapSize=CategoryAreaMap.size()
-    //println(CategoryAreaMapSize)
-
     for (i=0;i<CategoryAreaMapSize; i++)
     {
-    def CategoryAreaMapKeySetCounter = i
-    def CurrentTestCategory= CategoryAreaMapKeySet[CategoryAreaMapKeySetCounter]
-    //println (CurrentTestCategory)
-    CurrentTestAreas=CategoryAreaMap[CurrentTestCategory]
-    //println(CurrentTestAreas)
-
-    for (j=0;j< CurrentTestAreas.split(",").length; j++)
-    {
-        def AreaCounter = j
-        def CurrentArea = CurrentTestAreas.split(",")[AreaCounter]
-        try {
-            if ((env.ENABLED_TEST_CATEGORIES.split(",").contains(CurrentTestCategory)) && (env.ENABLED_TEST_AREAS.split(",").contains(CurrentArea))) {
-                def CurrentLogs = currentBuild.rawBuild.getLog(10000)
-                if (CurrentLogs == null) {
-                    CurrentLogs = "Unable_To_Get_Logs"
-                }
-                stage ("${CurrentTestCategory}-${CurrentArea}") {
-                    if ((!(CurrentLogs.contains("Aborted by")) && (!(CurrentLogs.contains("FlowInterruptedException"))))) {
-                        def globalSleepTime = 0;
-                        def branches = 0
-                        def runs = [:]
-                        def nodesMapLenght = nodesMap.size()
-                        def nodesMapKeySet=nodesMap.keySet()
-                        for (k=0; k < nodesMapLenght; k++) {
-                            def CurrentNodeCounter = k
-                            def testNode = nodesMapKeySet[CurrentNodeCounter]
-                            def mappedDistros = nodesMap[testNode]
-                            if (testNode != 'sriov') {
-                                testNode = 'ws2016'
-                            }
-                            def DISTROS_lenght = DISTROS.size()
-                            for (l=0; l < DISTROS_lenght; l++) {
-                                def CurrentDistroCounter = l
-                                def CurrentDistro = DISTROS[CurrentDistroCounter]
-                                def CurrentStageDistros = TestAndDistroMap["${CurrentTestCategory}-${CurrentArea}"]
-                                if (mappedDistros.contains("${CurrentDistro},") && CurrentStageDistros != null) {
-                                    if ((CurrentArea == "SRIOV" && testNode != 'sriov')) {
-                                        //Skip the SRIOV Tests if testnode is not sriov.
-                                    } else if (!(CurrentStageDistros.split(",").contains(CurrentDistro))) {
-                                        println("${CurrentTestCategory}-${CurrentArea} is not enabled for ${CurrentDistro}")
-                                    } else if (!(PassingDistros.contains(CurrentDistro))) {
-                                        println(" ${CurrentDistro} is not in PassingDistros.")
-                                    }
-                                    else {
-                                        branches = branches + 1
-                                        runs ["${CurrentDistro}-${testNode}"] = {
-                                            node ("${testNode}") {
-                                                try {
-                                                    stage ("${CurrentDistro}-${testNode}") {
-                                                    println ("stage ${CurrentDistro}-${testNode}")
-                                                        withCredentials([string(credentialsId: 'REDMOND_VHD_SHARE', variable: 'LISAImagesShareUrl'),
-                                                            file(credentialsId: 'Azure_Secrets_File', variable: 'Azure_Secrets_File')]) {
-                                                            def sleepTime = globalSleepTime
-                                                            globalSleepTime = globalSleepTime + 30
-                                                            def lisSuite = ''
-                                                            dir ("d${BUILD_NUMBER}") {
-                                                                checkout scm
-                                                                Prepare()
-                                                                RunPowershellCommand(".\\scripts\\lis_hyperv_platform\\lis-rpm-hyperv-tests.ps1" +
-                                                                    " -JobId '${CurrentDistro}-d-${BUILD_NUMBER}'" +
-                                                                    " -DistroVersion '${CurrentDistro}'" +
-                                                                    " -TestCategory ${CurrentTestCategory}" +
-                                                                    " -TestArea ${CurrentArea}" +
-                                                                    " -LISAImagesShareUrl '${env:LISAImagesShareUrl}'" +
-                                                                    " -LisUrl '${env:LIS_ARCHIVE_LINK}'" +
-                                                                    " -LisOldUrl '${env:LIS_OLD_ARCHIVE_LINK}'" +
-                                                                    " -ExcludeTests '${env:EXCLUDE_TESTS}'" +
-                                                                    " -IncludeTests '${env:RUN_SELECTED_TESTS}'" +
-                                                                    " -ExecutionTag '${env:EXECUTION_TAG}'" +
-                                                                    " -Delay '${sleepTime}'"
-                                                                )
-                                                                junit "Report\\*-junit.xml"
-                                                                archiveArtifacts '*-TestLogs.zip'
+        def CategoryAreaMapKeySetCounter = i
+        def CurrentTestCategory= CategoryAreaMapKeySet[CategoryAreaMapKeySetCounter]
+        CurrentTestAreas=CategoryAreaMap[CurrentTestCategory]
+        for (j=0;j< CurrentTestAreas.split(",").length; j++)
+        {
+            def AreaCounter = j
+            def CurrentArea = CurrentTestAreas.split(",")[AreaCounter]
+            try {
+                if ((env.ENABLED_TEST_CATEGORIES.split(",").contains(CurrentTestCategory)) && (env.ENABLED_TEST_AREAS.split(",").contains(CurrentArea))) {
+                    def CurrentLogs = currentBuild.rawBuild.getLog(10000)
+                    if (CurrentLogs == null) {
+                        CurrentLogs = "Unable_To_Get_Logs"
+                    }
+                    stage ("${CurrentTestCategory}-${CurrentArea}") {
+                        if ((!(CurrentLogs.contains("Aborted by")) && (!(CurrentLogs.contains("FlowInterruptedException"))))) {
+                            def globalSleepTime = 0;
+                            def branches = 0
+                            def runs = [:]
+                            def nodesMapLenght = nodesMap.size()
+                            def nodesMapKeySet=nodesMap.keySet()
+                            for (k=0; k < nodesMapLenght; k++) {
+                                def CurrentNodeCounter = k
+                                def testNode = nodesMapKeySet[CurrentNodeCounter]
+                                def mappedDistros = nodesMap[testNode]
+                                if (testNode != 'sriov') {
+                                    testNode = 'ws2016'
+                                }
+                                def DISTROS_lenght = DISTROS.size()
+                                for (l=0; l < DISTROS_lenght; l++) {
+                                    def CurrentDistroCounter = l
+                                    def CurrentDistro = DISTROS[CurrentDistroCounter]
+                                    def CurrentStageDistros = TestAndDistroMap["${CurrentTestCategory}-${CurrentArea}"]
+                                    if (mappedDistros.contains("${CurrentDistro},") && CurrentStageDistros != null) {
+                                        if ((CurrentArea == "SRIOV" && testNode != 'sriov')) {
+                                            //Skip the SRIOV Tests if testnode is not sriov.
+                                        } else if (!(CurrentStageDistros.split(",").contains(CurrentDistro))) {
+                                            println("${CurrentTestCategory}-${CurrentArea} is not enabled for ${CurrentDistro}")
+                                        } else {
+                                            branches = branches + 1
+                                            runs ["${CurrentDistro}-${testNode}"] = {
+                                                node ("${testNode}") {
+                                                    try {
+                                                        stage ("${CurrentDistro}-${testNode}") {
+                                                        println ("stage ${CurrentDistro}-${testNode}")
+                                                            withCredentials([string(credentialsId: 'REDMOND_VHD_SHARE', variable: 'LISAImagesShareUrl'),
+                                                                file(credentialsId: 'Azure_Secrets_File', variable: 'Azure_Secrets_File')]) {
+                                                                def sleepTime = globalSleepTime
+                                                                globalSleepTime = globalSleepTime + 30
+                                                                def lisSuite = ''
+                                                                dir ("d${BUILD_NUMBER}") {
+                                                                    checkout scm
+                                                                    Prepare()
+                                                                    RunPowershellCommand(".\\scripts\\lis_hyperv_platform\\lis-rpm-hyperv-tests.ps1" +
+                                                                        " -JobId '${CurrentDistro}-d-${BUILD_NUMBER}'" +
+                                                                        " -DistroVersion '${CurrentDistro}'" +
+                                                                        " -TestCategory ${CurrentTestCategory}" +
+                                                                        " -TestArea ${CurrentArea}" +
+                                                                        " -LISAImagesShareUrl '${env:LISAImagesShareUrl}'" +
+                                                                        " -LisUrl '${env:LIS_ARCHIVE_LINK}'" +
+                                                                        " -LisOldUrl '${env:LIS_OLD_ARCHIVE_LINK}'" +
+                                                                        " -ExcludeTests '${env:EXCLUDE_TESTS}'" +
+                                                                        " -IncludeTests '${env:RUN_SELECTED_TESTS}'" +
+                                                                        " -ExecutionTag '${env:EXECUTION_TAG}'" +
+                                                                        " -Delay '${sleepTime}'"
+                                                                    )
+                                                                    junit "Report\\*-junit.xml"
+                                                                    archiveArtifacts '*-TestLogs.zip'
+                                                                }
                                                             }
                                                         }
+                                                    } catch (exc) {
+                                                        currentBuild.result = 'SUCCESS'
+                                                        ErrorCount = ErrorCount + 1
+                                                    } finally {
+                                                        cleanWs()
                                                     }
-                                                } catch (exc) {
-                                                    currentBuild.result = 'SUCCESS'
-                                                    ErrorCount = ErrorCount + 1
-                                                } finally {
-                                                    cleanWs()
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
-                        }
-                        try {
-                            if ( branches != 0) {
-                                parallel runs
-                            } else {
-                                println ("No tests in this stage.")
+                            try {
+                                if ( branches != 0) {
+                                    parallel runs
+                                } else {
+                                    println ("No tests in this stage.")
+                                }
+                            } catch (exc) {
+                                currentBuild.result = 'SUCCESS'
+                                ErrorCount = ErrorCount + 1
                             }
-                        } catch (exc) {
-                            currentBuild.result = 'SUCCESS'
-                            ErrorCount = ErrorCount + 1
+                        } else {
+                            println("Aborting Stage : ${CurrentTestCategory}-${CurrentArea}")
                         }
-                    } else {
-                        println("Aborting Stage : ${CurrentTestCategory}-${CurrentArea}")
                     }
                 }
+            } catch (exc) {
+                currentBuild.result = 'SUCCESS'
+                println("EXCEPTION")
+                println(exc.toString());
+                ErrorCount = ErrorCount + 1
             }
-        } catch (exc) {
-            currentBuild.result = 'SUCCESS'
-            println("EXCEPTION")
-            println(exc.toString());
-            ErrorCount = ErrorCount + 1
         }
     }
-    }
-
     if (ErrorCount == 0) {
         currentBuild.result = 'SUCCESS'
     } else {
         currentBuild.result = 'FAILURE'
     }
-
 }

@@ -20,7 +20,7 @@ param(
 )
 
 foreach ($key in $MyInvocation.BoundParameters.keys) {
-    $value = (get-variable $key).Value 
+    $value = (get-variable $key).Value
     write-host "$key -> $value"
 }
 
@@ -39,8 +39,6 @@ function Main {
     $imageFolder = Join-Path $imageFolder $DistroVersion
     $parentVhd = $(Get-ChildItem $imageFolder | Where-Object { $_.Extension -eq ".vhd" -or $_.Extension -eq ".vhdx"} | Sort LastWriteTime | Select -Last 1).Name
     $VHD_Path = Join-Path $imageFolder $parentVhd
-    #$VHDName = $VHD_Path | Split-Path -Leaf
-    #$VHD_Path = "https://shitalfileshare.blob.core.windows.net/vhds/$($VHDName)"
     $VMgeneration = "1"
     if ($DistroVersion -like "*gen2vm*") {
         $VMgeneration = "2"
@@ -52,7 +50,6 @@ function Main {
         if ((Test-Path $VHD_Path) -or ($VHD_Path.StartsWith("http"))) {
             Write-Host "ComputerName: $env:computername"
             Write-Host "VHD : $VHD_Path"
-            #$VHD_Path = "\\redmond\wsscfs\OSTC\LIS\VHD\Cloudbase\CentOS\CentOS_7.2_x64\CentOS72x64.vhdx"
             $command = ".\Run-LisaV2.ps1 -TestPlatform HyperV"
             $command += " -XMLSecretFile '$env:Azure_Secrets_File'"
             $command += " -TestLocation 'localhost'"
