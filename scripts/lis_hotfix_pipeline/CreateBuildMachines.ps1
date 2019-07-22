@@ -76,7 +76,7 @@ try {
     $CreatedVMs = @()
     foreach ($operation in $VHDCopyOperations) {
         $OSDiskConfig = New-AzureRmDiskConfig -AccountType Standard_LRS  `
-            -Location $storageAccount.Location -CreateOption Import `
+            -Location $storageAccount.Location -CreateOption Attach `
             -SourceUri $operation.ICloudBlob.Uri.AbsoluteUri -OsType Linux
         $osDiskName =  "$($operation.Name)-OsDisk"
         $osDiskName = $osDiskName.Replace(' ','_')
